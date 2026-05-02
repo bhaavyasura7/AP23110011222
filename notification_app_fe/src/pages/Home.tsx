@@ -50,26 +50,24 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full">
+    <div className="home-page">
       <HeroSection />
-      
-      <div className="max-w-4xl mx-auto px-4">
+
+      <div className="container">
         <FilterBar selectedType={selectedType} onSelect={setSelectedType} />
 
         {error && (
-          <div className="bg-destructive/10 text-destructive border border-destructive p-4 mb-8 text-center font-sans">
-            {error}
-          </div>
+          <div className="error-banner">{error}</div>
         )}
 
         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <div className="spinner-wrap">
+            <div className="spinner" />
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="notifications-list">
             {notifications.length === 0 ? (
-              <p className="text-center text-muted-foreground py-12">No notifications found.</p>
+              <p className="empty-state">No notifications found.</p>
             ) : (
               notifications.map((notif, idx) => (
                 <NotificationCard key={notif.ID} notification={notif} index={idx} />

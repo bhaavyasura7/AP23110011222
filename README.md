@@ -1,6 +1,6 @@
 # Campus Notification System
 
-A full-stack campus notification platform built as part of the Afford Medical Technologies evaluation. The system fetches, prioritizes, and displays campus notifications across a beautiful React frontend — powered by a Node.js backend with a custom logging middleware.
+A full-stack campus notification platform that fetches, prioritizes, and displays campus notifications across a responsive React frontend — powered by a Node.js backend with a custom logging middleware.
 
 ---
 
@@ -50,7 +50,7 @@ onlinetest/
 | Layer | Technology |
 |---|---|
 | Frontend | React 18, TypeScript, Vite |
-| Styling | Tailwind CSS v3 (warm custom theme) |
+| Styling | Vanilla CSS (warm custom theme) |
 | Animations | Framer Motion |
 | Icons | Heroicons |
 | Backend | Node.js, TypeScript, ts-node |
@@ -108,7 +108,7 @@ Notifications are sorted by weight first. If two notifications share the same we
 
 ## Logging Middleware
 
-Every significant action in the app is logged using the custom `Logger` utility in `logging middleware/logger.ts`. 
+Every significant action in the app is logged using the custom `Logger` utility in `logging middleware/logger.ts`.
 
 Each log call sends a POST request to the evaluation log server:
 
@@ -155,12 +155,5 @@ The proxy then forwards the request with the correct Bearer token, avoiding brow
 - **No glassmorphism** — The UI uses solid, warm-toned rectangular cards as required.
 - **Island Navbar** — A floating, centered navigation bar with Framer Motion entrance animations.
 - **Parallax Hero** — The landing section uses scroll-based parallax via Framer Motion's `useScroll`.
+- **Vanilla CSS** — All styling written in plain CSS using CSS custom properties (no framework).
 - **Fallback data** — If the proxy or live API is unreachable, the app gracefully falls back to a cached snapshot of real API data (no crash, no blank screen).
-
----
-
-## Author
-
-**Bhaavya Sura**  
-Roll No: AP23110011222  
-SRM University AP

@@ -2,13 +2,14 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import PriorityInbox from './pages/PriorityInbox';
+import './index.css';
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen flex flex-col font-sans">
+      <div className="app-shell">
         <Navbar />
-        <main className="flex-grow pt-24 pb-12">
+        <main className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/priority" element={<PriorityInbox />} />

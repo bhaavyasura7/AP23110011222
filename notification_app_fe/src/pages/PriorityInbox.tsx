@@ -25,8 +25,8 @@ export default function PriorityInbox() {
       try {
         const response = await axios.get<NotificationResponse>('http://localhost:5000/api/notifications?limit=10');
         processTopN(response.data.notifications || []);
-      } catch (error: any) {
-        Logger.warn('PriorityInbox', `Proxy unreachable (${error.message}). Using cached fallback data.`);
+      } catch (err: any) {
+        Logger.warn('PriorityInbox', `Proxy unreachable (${err.message}). Using cached fallback data.`);
         const fallbackData: Notification[] = [
           { "ID": "1fb4b6a2-5624-4588-972a-0abec4649fa2", "Type": "Result", "Message": "project-review", "Timestamp": "2026-05-01 08:06:27" },
           { "ID": "78621118-67cb-4383-a335-58d798cf9705", "Type": "Event", "Message": "cult-fest", "Timestamp": "2026-05-02 02:36:21" },
@@ -54,39 +54,36 @@ export default function PriorityInbox() {
       if (weightDiff !== 0) return weightDiff;
       return new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime();
     });
-    
-    // Configurable 'n' -> let's use top 10 as specified in stage 1
+
     const top10 = sorted.slice(0, 10);
     Logger.info('PriorityInbox', `Processed top ${top10.length} notifications.`);
     setNotifications(top10);
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 mt-12">
-      <div className="flex items-center gap-4 mb-8 pb-4 border-b border-border">
-        <div className="p-4 bg-primary text-primary-foreground rounded-none shadow-md">
-          <InboxStackIcon className="w-8 h-8" />
+    <div className="priority-page">
+      <div className="priority-header">
+        <div className="priority-header-icon">
+          <InboxStackIcon />
         </div>
         <div>
-          <h1 className="text-4xl font-serif font-bold text-foreground">Priority Inbox</h1>
-          <p className="text-muted-foreground font-sans mt-2">
+          <h1 className="priority-title">Priority Inbox</h1>
+          <p className="priority-subtitle">
             Your top 10 most critical updates, ranked by importance and recency.
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="bg-destructive/10 text-destructive border border-destructive p-4 mb-8 text-center font-sans">
-          {error}
-        </div>
+        <div className="error-banner">{error}</div>
       )}
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="spinner-wrap">
+          <div className="spinner" />
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="notifications-list">
           {notifications.map((notif, idx) => (
             <NotificationCard key={notif.ID} notification={notif} index={idx} />
           ))}

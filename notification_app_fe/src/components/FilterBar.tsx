@@ -9,14 +9,10 @@ export default function FilterBar({ selectedType, onSelect }: Props) {
   const types: NotificationType[] = ['Event', 'Result', 'Placement'];
 
   return (
-    <div className="flex flex-wrap gap-4 mb-8 justify-center">
+    <div className="filter-bar">
       <button
         onClick={() => onSelect(null)}
-        className={`px-6 py-2 border-2 transition-all font-sans font-medium uppercase tracking-wider text-sm ${
-          selectedType === null
-            ? 'bg-primary border-primary text-primary-foreground'
-            : 'bg-transparent border-border text-muted-foreground hover:border-primary/50'
-        }`}
+        className={`filter-btn${selectedType === null ? ' active' : ''}`}
       >
         All
       </button>
@@ -24,11 +20,7 @@ export default function FilterBar({ selectedType, onSelect }: Props) {
         <button
           key={type}
           onClick={() => onSelect(type)}
-          className={`px-6 py-2 border-2 transition-all font-sans font-medium uppercase tracking-wider text-sm ${
-            selectedType === type
-              ? 'bg-primary border-primary text-primary-foreground'
-              : 'bg-transparent border-border text-muted-foreground hover:border-primary/50'
-          }`}
+          className={`filter-btn${selectedType === type ? ' active' : ''}`}
         >
           {type}
         </button>
