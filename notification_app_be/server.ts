@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import axios from 'axios';
 // @ts-ignore
-import { Log } from '../logging middleware/logger';
+import { Logger } from '../logging middleware/logger';
 
 const app = express();
 const PORT = 5000;
@@ -12,7 +12,7 @@ app.use(express.json());
 
 app.get('/api/notifications', async (req, res) => {
     try {
-        Log('backend', 'info', 'route', `Received request for notifications. Query: ${JSON.stringify(req.query)}`);
+        Logger.info('Proxy', `Received request for notifications. Query: ${JSON.stringify(req.query)}`);
         
         let url = 'http://20.207.122.201/evaluation-service/notifications';
         
@@ -22,7 +22,7 @@ app.get('/api/notifications', async (req, res) => {
             url += `?${queryParams}`;
         }
 
-        Log('backend', 'info', 'route', `Forwarding request to: ${url}`);
+        Logger.info('Proxy', `Forwarding request to: ${url}`);
 
         const response = await axios.get(url, {
             headers: {
@@ -30,10 +30,10 @@ app.get('/api/notifications', async (req, res) => {
             }
         });
 
-        Log('backend', 'info', 'route', `Successfully fetched ${response.data.notifications?.length || 0} items from API.`);
+        Logger.info('Proxy', `Successfully fetched ${response.data.notifications?.length || 0} items from API.`);
         res.json(response.data);
     } catch (error: any) {
-        Log('backend', 'error', 'route', `Failed to fetch from live API: ${error.message}`);
+        Logger.error('Proxy', `Failed to fetch from live API: ${error.message}`);
         
         // Check if token might be expired or if it's a network error
         if (error.response?.status === 401) {
@@ -45,5 +45,5 @@ app.get('/api/notifications', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    Log('backend', 'info', 'route', `Backend proxy server listening on http://localhost:${PORT}`);
+    Logger.info('Server', `Backend proxy server listening on http://localhost:${PORT}`);
 });

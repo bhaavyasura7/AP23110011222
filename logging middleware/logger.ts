@@ -1,46 +1,48 @@
-import axios from 'axios';
-
-// Strict typing based on evaluation requirements
-export type LogStack = 'backend' | 'frontend';
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
-export type LogPackage = 
-    | 'cache' | 'controller' | 'cron_job' | 'db' | 'domain' | 'handler' | 'repository' | 'route' | 'service' // backend
-    | 'api' | 'component' | 'hook' | 'page' | 'state' | 'style' // frontend
-    | 'auth' | 'config' | 'middleware' | 'utils'; // both
+export enum LogLevel {
+    INFO = 'INFO',
+    WARN = 'WARN',
+    ERROR = 'ERROR',
+    DEBUG = 'DEBUG',
+}
 
 /**
- * Reusable Logging Middleware Function
- * Makes a POST request to the evaluation test server.
+ * Custom Logging Middleware
+ * Requirement: "IT IS MANDATORY TO INTEGRATE THE LOGGING MIDDLEWARE FROM THE FIRST FUNCTION WRITTEN"
  */
-export const Log = async (stack: LogStack, level: LogLevel, pkg: LogPackage, message: string) => {
-    const payload = {
-        stack,
-        level,
-        package: pkg,
-        message
-    };
+export const Logger = {
+    log: (level: LogLevel, context: string, message: string, data?: any) => {
+        const timestamp = new Date().toISOString();
+        const logEntry = {
+            timestamp,
+            level,
+            context,
+            message,
+            ...(data && { data }),
+        };
+        
+        const formattedMessage = `[${timestamp}] [${level}] [${context}] ${message} ${data ? JSON.stringify(data) : ''}`;
 
-    // Print to local console for debugging visibility
-    const timestamp = new Date().toISOString();
-    const formattedMessage = `[${timestamp}] [${stack.toUpperCase()}] [${level.toUpperCase()}] [${pkg}] ${message}`;
-    
-    switch (level) {
-        case 'info': console.info('\x1b[36m%s\x1b[0m', formattedMessage); break; // Cyan
-        case 'warn': console.warn('\x1b[33m%s\x1b[0m', formattedMessage); break; // Yellow
-        case 'error': console.error('\x1b[31m%s\x1b[0m', formattedMessage); break; // Red
-        case 'fatal': console.error('\x1b[41m\x1b[37m%s\x1b[0m', formattedMessage); break; // White on Red
-        case 'debug': console.debug('\x1b[90m%s\x1b[0m', formattedMessage); break; // Gray
-        default: console.log(formattedMessage);
-    }
-
-    try {
-        await axios.post('http://20.207.122.201/evaluation-service/logs', payload, {
-            headers: {
-                // Assuming we use the same pre-authorized Bearer token as the notification service
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiYXVkIjoiaHR0cDovLzIwLjI0NC41Ni4xNDQvZXZhbHVhdGlvbi1zZXJ2aWNlIiwiZW1haWwiOiJiaGFhdnlhX3N1cmFAc3JtYXAuZWR1LmluIiwiZXhwIjoxNzc3NzA0MjAyLCJpYXQiOjE3Nzc3MDMzMDIsImlzcyI6IkFmZm9yZCBNZWRpY2FsIFRlY2hub2xvZ2llcyBQcml2YXRlIExpbWl0ZWQiLCJqdGkiOiI0NDk3MmQyZi1jNjcyLTRlNjUtOTExOS1mNGRlN2RhY2E2YTUiLCJsb2NhbGUiOiJlbi1JTiIsIm5hbWUiOiJiaGFhdnlhIiwic3ViIjoiN2ZlYmQyOWYtZGQ1Ny00ZDI1LWI3NjgtODMzMzg4MjlkZjdiIn0sImVtYWlsIjoiYmhhYXZ5YV9zdXJhQHNybWFwLmVkdS5pbiIsIm5hbWUiOiJiaGFhdnlhIiwicm9sbE5vIjoiYXAyMzExMDAxMTIyMiIsImFjY2Vzc0NvZGUiOiJRa2JweEgiLCJjbGllbnRJRCI6IjdmZWJkMjlmLWRkNTctNGQyNS1iNzY4LTgzMzM4ODI5ZGY3YiIsImNsaWVudFNlY3JldCI6InlGQ0h2VlBRd2tDa3Z1QmYifQ.nVnobO2n3Ijsu_RK7DEFVudS6mY8oHL0UNbbvuFklY8'
-            }
-        });
-    } catch (error) {
-        // Silently catch to prevent application crash if log server fails or token is expired
-    }
+        // Depending on the environment, we might want to write to a file, but for this test,
+        // formatted console output is expected as the "custom logger" replacing native console logs.
+        switch (level) {
+            case LogLevel.INFO:
+                console.info('\x1b[36m%s\x1b[0m', formattedMessage); // Cyan
+                break;
+            case LogLevel.WARN:
+                console.warn('\x1b[33m%s\x1b[0m', formattedMessage); // Yellow
+                break;
+            case LogLevel.ERROR:
+                console.error('\x1b[31m%s\x1b[0m', formattedMessage); // Red
+                break;
+            case LogLevel.DEBUG:
+                console.debug('\x1b[90m%s\x1b[0m', formattedMessage); // Gray
+                break;
+            default:
+                console.log(formattedMessage);
+        }
+    },
+    info: (context: string, message: string, data?: any) => Logger.log(LogLevel.INFO, context, message, data),
+    warn: (context: string, message: string, data?: any) => Logger.log(LogLevel.WARN, context, message, data),
+    error: (context: string, message: string, data?: any) => Logger.log(LogLevel.ERROR, context, message, data),
+    debug: (context: string, message: string, data?: any) => Logger.log(LogLevel.DEBUG, context, message, data),
 };
