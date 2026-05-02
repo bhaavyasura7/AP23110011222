@@ -26,7 +26,7 @@ const PRIORITY_WEIGHTS: Record<Notification['Type'], number> = {
  * Fetches notifications from the provided API.
  */
 async function fetchNotifications(): Promise<Notification[]> {
-    Logger.info('fetchNotifications', `Starting fetch from ${API_URL}`);
+    Logger.backend.info('service', 'fetchNotifications', `Starting fetch from ${API_URL}`);
     try {
         const response = await axios.get<ApiResponse>(`${API_URL}?limit=10`, {
             headers: {
@@ -34,10 +34,10 @@ async function fetchNotifications(): Promise<Notification[]> {
             }
         });
         const notifications = response.data.notifications;
-        Logger.info('fetchNotifications', `Successfully fetched ${notifications?.length || 0} notifications.`);
+        Logger.backend.info('service', 'fetchNotifications', `Successfully fetched ${notifications?.length || 0} notifications.`);
         return notifications || [];
     } catch (error: any) {
-        Logger.warn('fetchNotifications', `Failed to fetch from API (${error.message}). Using cached fallback data.`);
+        Logger.backend.warn('service', 'fetchNotifications', `Failed to fetch from API (${error.message}). Using cached fallback data.`);
         return [
             { ID: "1fb4b6a2-5624-4588-972a-0abec4649fa2", Type: "Result", Message: "project-review", Timestamp: "2026-05-01 08:06:27" },
             { ID: "78621118-67cb-4383-a335-58d798cf9705", Type: "Event", Message: "cult-fest", Timestamp: "2026-05-02 02:36:21" },
@@ -79,13 +79,10 @@ function compareNotifications(a: Notification, b: Notification): number {
  * Retrieves the top N notifications based on priority.
  */
 function getTopNotifications(notifications: Notification[], n: number): Notification[] {
-    Logger.debug('getTopNotifications', `Sorting ${notifications.length} notifications to find top ${n}`);
-    
-    // Sort based on priority weight, then recency
+    Logger.backend.debug('utils', 'getTopNotifications', `Sorting ${notifications.length} notifications to find top ${n}`);
     const sorted = [...notifications].sort(compareNotifications);
-    
     const topN = sorted.slice(0, n);
-    Logger.info('getTopNotifications', `Successfully retrieved top ${n} notifications.`);
+    Logger.backend.info('utils', 'getTopNotifications', `Successfully retrieved top ${n} notifications.`);
     return topN;
 }
 
@@ -93,26 +90,26 @@ function getTopNotifications(notifications: Notification[], n: number): Notifica
  * Main application entry point
  */
 async function main() {
-    Logger.info('System', 'Starting Priority Inbox Backend...');
+    Logger.backend.info('service', 'System', 'Starting Priority Inbox Backend...');
     
     const allNotifications = await fetchNotifications();
     
     if (allNotifications.length === 0) {
-        Logger.warn('System', 'No notifications to process.');
+        Logger.backend.warn('service', 'System', 'No notifications to process.');
         return;
     }
 
     const n = 10;
     const top10 = getTopNotifications(allNotifications, n);
 
-    Logger.info('System', `--- TOP ${n} NOTIFICATIONS ---`);
+    Logger.backend.info('service', 'System', `--- TOP ${n} NOTIFICATIONS ---`);
     top10.forEach((notif, index) => {
-        Logger.info('PriorityInbox', `#${index + 1} | [${notif.Type}] ${notif.Message} | ${notif.Timestamp}`);
+        Logger.backend.info('service', 'PriorityInbox', `#${index + 1} | [${notif.Type}] ${notif.Message} | ${notif.Timestamp}`);
     });
-    Logger.info('System', 'Priority Inbox processing complete.');
+    Logger.backend.info('service', 'System', 'Priority Inbox processing complete.');
 }
 
 // Execute the main function
 main().catch((error) => {
-    Logger.error('System', `Unhandled application error: ${error.message}`);
+    Logger.backend.fatal('service', 'System', `Unhandled application error: ${error.message}`);
 });
